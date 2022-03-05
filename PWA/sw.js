@@ -3,9 +3,8 @@
 // Mendaftarkan Cache name dan dokumen apa saja yang ingin kita simpan kedalam cache, sehingga kita bisa menggunakan dokumen yg sdh kita simpan di cache secara offline.
 var CACHE_NAME = 'theo-cache-v1';
 var urlsToCache = [
-  '/',
-  '/index.html',
-  '/offline.html',
+  '/PWA/index.html',
+  '/PWA/offline.html',
 ];
 
 
