@@ -15,7 +15,7 @@
             "purpose": "any maskable"
         }
     ],
-    "start_url": "/PWA/index.html",
+    "start_url": "/index.html",
     "background_color": "#31a0f7",
     "display": "standalone",
     "scope": "/",
