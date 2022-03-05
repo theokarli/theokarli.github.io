@@ -1,11 +1,11 @@
 // Kita akan Install Service Worker, tapi ada beberapa hal yang harus diperhatikan :
 
 // Mendaftarkan Cache name dan dokumen apa saja yang ingin kita simpan kedalam cache, sehingga kita bisa menggunakan dokumen yg sdh kita simpan di cache secara offline.
-var CACHE_NAME = 'theo-cache-v2';
+var CACHE_NAME = 'theo-cache-v1';
 var urlsToCache = [
   '/',
   '/index.html',
-  '/offline.html'
+  '/offline.html',
 ];
 
 
