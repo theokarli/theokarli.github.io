@@ -1,0 +1,129 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+nav ul a,
+nav .brand-logo {
+  color: #444;
+}
+
+p {
+  line-height: 2rem;
+}
+
+.sidenav-trigger {
+  color: #26a69a;
+}
+
+.parallax-container {
+  min-height: 380px;
+  line-height: 0;
+  height: auto;
+  color: rgba(255, 255, 255, .9);
+}
+
+.parallax-container .section {
+  width: 100%;
+}
+
+@media only screen and (max-width : 992px) {
+  .parallax-container .section {
+    position: absolute;
+    top: 40%;
+  }
+
+  #index-banner .section {
+    top: 10%;
+  }
+}
+
+@media only screen and (max-width : 600px) {
+  #index-banner .section {
+    top: 0;
+  }
+}
+
+.icon-block {
+  padding: 0 15px;
+}
+
+.icon-block .material-icons {
+  font-size: inherit;
+}
+
+footer.page-footer {
+  margin: 0;
+}
+
+
+body {
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+.bluechef {
+  background-color: #ff9c5b;
+}
+
+.bluechef-text {
+  color: #0000bf;
+}
+
+.teal-text.text-lighten-2 {
+  color: #5486ff !important;
+  font-weight: 700;
+  text-shadow: 3px 3px 5px rgba(255, 255, 255, 0.774);
+}
+
+.brand-logo img {
+  width: 50px;
+}
+
+.teal.lighten-1 {
+  background-color: #4367e3 !important;
+}
+
+.waves-effect {
+  border-radius: 10px;
+}
+
+.icon-block .material-icons {
+  background-color: rgba(80, 191, 255, 0.5);
+}
+
+p.light {
+  text-align: justify;
+}
+
+h5.header {
+  background-color: rgba(0, 0, 0, .6);
+  border-radius: 8px;
+  text-align: center;
+  display: inline;
+  padding: 5px;
+  font-weight: 600;
+}
+
+.teal {
+  background-color: #ff9c5b !important;
+}
+
+
+blockquote {
+  margin: 20 px 0;
+  padding-left: 1.5 rem;
+  border-left: 5 px solid #ee6e73;
+  color: #ffffff !important;
+  text-align: justify;
+}
+
+h5.white-text {
+  text-decoration: underline;
+}
+
+footer.page-footer div.footer-copyright span {
+  margin: 0px auto;
+}
