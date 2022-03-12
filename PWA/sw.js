@@ -55,7 +55,7 @@ self.addEventListener('fetch', function(event) {
         )
       }).catch(function () {  // Untuk menampilkan offline.html ketika tidak ada koneksi internet
         // If both fail, show a generic fallback:
-        return caches.match('./PWA/offline.html');
+        return caches.match('./offline.html');
         // However, in reality you'd have many different
         // fallbacks, depending on URL and headers.
         // Eg, a fallback silhouette image for avatars.
