@@ -70,23 +70,15 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request).then((cacheResponse) => {
-      if (cacheResponse) {
-        fetch(event.request).then((networkResponse) => {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
-          });
-        });
-        return cacheResponse;
-      } else {
-        return fetch(event.request).then((networkResponse) => {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, networkResponse.clone());
-          });
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(event.request).then((cacheResponse) => {
+        var fetchPromise = fetch(event.request).then((networkResponse) => {
+          cache.put(event.request, networkResponse.clone());
           return networkResponse;
         });
-      }
+
+        return cacheResponse || fetchPromise;
+      });
     })
   );
 });
