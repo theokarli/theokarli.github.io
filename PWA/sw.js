@@ -73,7 +73,7 @@ self.addEventListener('fetch', function(event) {
     caches.match(event.request).then((cacheResponse) => {
       if (cacheResponse) {
         fetch(event.request).then((networkResponse) => {
-          caches.open(currentCache).then((cache) => {
+          caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, networkResponse.clone());
             return networkResponse;
           });
@@ -81,7 +81,7 @@ self.addEventListener('fetch', function(event) {
         return cacheResponse;
       } else {
         return fetch(event.request).then((networkResponse) => {
-          caches.open(currentCache).then((cache) => {
+          caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, networkResponse.clone());
           });
           return networkResponse;
