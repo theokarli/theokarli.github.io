@@ -68,36 +68,44 @@ self.addEventListener('install', function(event) {
 
 
 
+
 self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.match(event.request)
-        .then(function(cacheResponse) {
-          // Try fetching the request from the network
-          var fetchPromise = fetch(event.request)
-            .then(function(networkResponse) {
-              // Check if the response is valid
-              if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-                return cacheResponse;
-              }
-
-              // Clone the response since it's being used by cache and browser
-              var responseToCache = networkResponse.clone();
-
-              // Cache the response for future use
-              cache.put(event.request, responseToCache);
-
-              return networkResponse;
-            })
-            .catch(function() {
-              return cacheResponse || caches.match('./offline.html');
-            });
-
-          // Return cached response while revalidating in the background
-          return cacheResponse || fetchPromise;
+  if (event.request.url.includes('index.html')) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(function(cache) {
+        return fetch(event.request).then(function(response) {
+          if (response.status === 200) {
+            cache.put(event.request, response.clone());
+          }
+          return response;
         });
-    })
-  );
+      })
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request).then(function(response) {
+        if (response) {
+          return response;
+        }
+
+        return fetch(event.request).then(function(response) {
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+
+          var responseToCache = response.clone();
+
+          caches.open(CACHE_NAME).then(function(cache) {
+            cache.put(event.request, responseToCache);
+          });
+
+          return response;
+        }).catch(function() {
+          return caches.match('./offline.html');
+        });
+      })
+    );
+  }
 });
 
 
