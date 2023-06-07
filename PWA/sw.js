@@ -70,15 +70,32 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((cacheResponse) => {
-        var fetchPromise = fetch(event.request).then((networkResponse) => {
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
-        });
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.match(event.request)
+        .then(function(cacheResponse) {
+          // Try fetching the request from the network
+          var fetchPromise = fetch(event.request)
+            .then(function(networkResponse) {
+              // Check if the response is valid
+              if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                return cacheResponse;
+              }
 
-        return cacheResponse || fetchPromise;
-      });
+              // Clone the response since it's being used by cache and browser
+              var responseToCache = networkResponse.clone();
+
+              // Cache the response for future use
+              cache.put(event.request, responseToCache);
+
+              return networkResponse;
+            })
+            .catch(function() {
+              return cacheResponse || caches.match('./offline.html');
+            });
+
+          // Return cached response while revalidating in the background
+          return cacheResponse || fetchPromise;
+        });
     })
   );
 });
