@@ -23,45 +23,80 @@ self.addEventListener('install', function(event) {
 
 // Setelah kita install Service Worker, kita akan melakukan Fetching dan Activate Cache, sehingga kita bisa menggunakan dokumen yg kita simpan di cache secara offline.
 // Fetching (Kita Fetch/Ambil data dari cache storage yg sudah kita buat, jika ada kita ambil):
+// self.addEventListener('fetch', function(event) {
+//   event.respondWith(
+//     caches.match(event.request)
+//       .then(function(response) {
+//         // Cache hit - return response
+//         if (response) {
+//           return response;
+//         }
+
+//         return fetch(event.request).then(
+//           function(response) {
+//             // Check if we received a valid response
+//             if(!response || response.status !== 200 || response.type !== 'basic') {
+//               return response;
+//             }
+
+//             // IMPORTANT: Clone the response. A response is a stream
+//             // and because we want the browser to consume the response
+//             // as well as the cache consuming the response, we need
+//             // to clone it so we have two streams.
+//             var responseToCache = response.clone();
+
+//             caches.open(CACHE_NAME)
+//               .then(function(cache) {
+//                 cache.put(event.request, responseToCache);
+//               });
+
+//             return response;
+//           }
+//         )
+//       }).catch(function () {  // Untuk menampilkan offline.html ketika tidak ada koneksi internet
+//         // If both fail, show a generic fallback:
+//         return caches.match('./offline.html');
+//         // However, in reality you'd have many different
+//         // fallbacks, depending on URL and headers.
+//         // Eg, a fallback silhouette image for avatars.
+//       })
+//     );
+// });
+
+
+
+
+
+
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-
-        return fetch(event.request).then(
-          function(response) {
-            // Check if we received a valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // IMPORTANT: Clone the response. A response is a stream
-            // and because we want the browser to consume the response
-            // as well as the cache consuming the response, we need
-            // to clone it so we have two streams.
-            var responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        )
-      }).catch(function () {  // Untuk menampilkan offline.html ketika tidak ada koneksi internet
-        // If both fail, show a generic fallback:
-        return caches.match('./offline.html');
-        // However, in reality you'd have many different
-        // fallbacks, depending on URL and headers.
-        // Eg, a fallback silhouette image for avatars.
-      })
-    );
+    caches.match(event.request).then((cacheResponse) => {
+      if (cacheResponse) {
+        fetch(event.request).then((networkResponse) => {
+          caches.open(currentCache).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        });
+        return cacheResponse;
+      } else {
+        return fetch(event.request).then((networkResponse) => {
+          caches.open(currentCache).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+          });
+          return networkResponse;
+        });
+      }
+    })
+  );
 });
+
+
+
+
+
+
+
 
 
 // Activate Cache (Setelah kita Fetch data dari cache storage, kita akan aktifkan dan menggunakan cache storage untuk web kita. Sehingga kita bisa menggunakan dokumen yg kita simpan di cache secara offline):
