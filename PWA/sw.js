@@ -72,34 +72,34 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return cache.match(event.request)
-          .then(function(response) {
-            if (response) {
-              return response; // Return the cached response if available
-            }
+    fetch(event.request)
+      .then(function(response) {
+        // Check if we received a valid response
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
 
-            // Fallback to offline.html when offline and page is not cached
-            if (!navigator.onLine) {
-              return caches.match('./offline.html');
-            }
+        // IMPORTANT: Clone the response. A response is a stream
+        // and because we want the browser to consume the response
+        // as well as the cache consuming the response, we need
+        // to clone it so we have two streams.
+        var responseToCache = response.clone();
 
-            return fetch(event.request)
-              .then(function(networkResponse) {
-                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-                  return networkResponse;
-                }
-
-                var responseToCache = networkResponse.clone();
-                cache.put(event.request, responseToCache);
-                
-                return networkResponse;
-              });
+        caches.open(CACHE_NAME)
+          .then(function(cache) {
+            cache.put(event.request, responseToCache);
           });
+
+        return response;
       })
       .catch(function() {
-        return caches.match('./offline.html');
+        return caches.match(event.request)
+          .then(function(response) {
+            if (response) {
+              return response;
+            }
+            return caches.match('./offline.html');
+          });
       })
   );
 });
