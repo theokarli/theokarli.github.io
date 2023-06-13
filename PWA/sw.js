@@ -70,14 +70,21 @@ self.addEventListener('install', function(event) {
 
 
 
+
+
+
+
 self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.open(CACHE_NAME)
       .then(function(cache) {
         return cache.match(event.request)
           .then(function(response) {
+            // Return the cached response if available
             if (response) {
-              return response; // Return the cached response if available
+              // Fetch the request in the background to update the cache
+              event.waitUntil(fetchAndCache(event.request));
+              return response;
             }
 
             // Fallback to offline.html when offline and page is not cached
@@ -85,17 +92,8 @@ self.addEventListener('fetch', function(event) {
               return caches.match('./offline.html');
             }
 
-            return fetch(event.request)
-              .then(function(networkResponse) {
-                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-                  return networkResponse;
-                }
-
-                var responseToCache = networkResponse.clone();
-                cache.put(event.request, responseToCache);
-                
-                return networkResponse;
-              });
+            // Fetch the request and update the cache
+            return fetchAndCache(event.request);
           });
       })
       .catch(function() {
@@ -103,6 +101,39 @@ self.addEventListener('fetch', function(event) {
       })
   );
 });
+
+
+// Fetch the request, update the cache, and return the response
+function fetchAndCache(request) {
+  return fetch(request)
+    .then(function(response) {
+      // Check if we received a valid response
+      if (!response || response.status !== 200 || response.type !== 'basic') {
+        return response;
+      }
+
+      // Clone the response to store in cache
+      var responseToCache = response.clone();
+
+      // Update the cache with the new response
+      caches.open(CACHE_NAME)
+        .then(function(cache) {
+          cache.put(request, responseToCache);
+        });
+
+      return response;
+    });
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
