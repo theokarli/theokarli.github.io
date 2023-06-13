@@ -122,6 +122,11 @@ function fetchAndCache(request) {
         });
 
       return response;
+    })
+    .catch(function(error) {
+      // Handle fetch error when there is no internet connection
+      console.log('Fetch error:', error);
+      return caches.match(request);
     });
 }
 
