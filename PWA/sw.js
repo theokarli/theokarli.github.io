@@ -107,6 +107,10 @@ self.addEventListener('fetch', function(event) {
 
 // Fetch the request, update the cache, and return the response
 function fetchAndCache(request) {
+  if (!navigator.onLine) {
+    return;
+  }
+  
   return fetch(request)
     .then(function(response) {
       // Check if we received a valid response
