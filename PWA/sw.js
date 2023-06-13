@@ -82,8 +82,10 @@ self.addEventListener('fetch', function(event) {
           .then(function(response) {
             // Return the cached response if available
             if (response) {
-              // Fetch the request in the background to update the cache
-              event.waitUntil(fetchAndCache(event.request));
+              // Fetch the request in the background to update the cache (if online)
+              if (navigator.onLine) {
+                event.waitUntil(fetchAndCache(event.request));
+              }
               return response;
             }
 
