@@ -76,30 +76,30 @@ self.addEventListener('fetch', function(event) {
       .then(function(cache) {
         return cache.match(event.request)
           .then(function(response) {
-            // Stale-While-Revalidate strategy
-            var fetchPromise = fetch(event.request)
+            if (response) {
+              return response; // Return the cached response if available
+            }
+
+            // Fallback to offline.html when offline and page is not cached
+            if (!navigator.onLine) {
+              return caches.match('./offline.html');
+            }
+
+            return fetch(event.request)
               .then(function(networkResponse) {
-                // Check if we received a valid response
                 if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
                   return networkResponse;
                 }
 
-                // IMPORTANT: Clone the response.
                 var responseToCache = networkResponse.clone();
-
-                cache.put(event.request, responseToCache); // Update the cache with the latest response
-
+                cache.put(event.request, responseToCache);
+                
                 return networkResponse;
-              })
-              .catch(function() {
-                return response; // If fetching from network fails, return the cached response
               });
-
-            return response || fetchPromise; // Return the cached response if available, otherwise return the fetch promise
           });
       })
-      .catch(function () {
-        return caches.match('./offline.html'); // Show the offline page when cache is not available
+      .catch(function() {
+        return caches.match('./offline.html');
       })
   );
 });
