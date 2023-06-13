@@ -23,127 +23,45 @@ self.addEventListener('install', function(event) {
 
 // Setelah kita install Service Worker, kita akan melakukan Fetching dan Activate Cache, sehingga kita bisa menggunakan dokumen yg kita simpan di cache secara offline.
 // Fetching (Kita Fetch/Ambil data dari cache storage yg sudah kita buat, jika ada kita ambil):
-// self.addEventListener('fetch', function(event) {
-//   event.respondWith(
-//     caches.match(event.request)
-//       .then(function(response) {
-//         // Cache hit - return response
-//         if (response) {
-//           return response;
-//         }
-
-//         return fetch(event.request).then(
-//           function(response) {
-//             // Check if we received a valid response
-//             if(!response || response.status !== 200 || response.type !== 'basic') {
-//               return response;
-//             }
-
-//             // IMPORTANT: Clone the response. A response is a stream
-//             // and because we want the browser to consume the response
-//             // as well as the cache consuming the response, we need
-//             // to clone it so we have two streams.
-//             var responseToCache = response.clone();
-
-//             caches.open(CACHE_NAME)
-//               .then(function(cache) {
-//                 cache.put(event.request, responseToCache);
-//               });
-
-//             return response;
-//           }
-//         )
-//       }).catch(function () {  // Untuk menampilkan offline.html ketika tidak ada koneksi internet
-//         // If both fail, show a generic fallback:
-//         return caches.match('./offline.html');
-//         // However, in reality you'd have many different
-//         // fallbacks, depending on URL and headers.
-//         // Eg, a fallback silhouette image for avatars.
-//       })
-//     );
-// });
-
-
-
-
-
-
-
-
-
-
-
-
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return cache.match(event.request)
-          .then(function(response) {
-            // Return the cached response if available
-            if (response) {
-              // Fetch the request in the background to update the cache (if online)
-              if (navigator.onLine) {
-                event.waitUntil(fetchAndCache(event.request));
-              }
+    caches.match(event.request)
+      .then(function(response) {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+
+        return fetch(event.request).then(
+          function(response) {
+            // Check if we received a valid response
+            if(!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
 
-            // Fallback to offline.html when offline and page is not cached
-            if (!navigator.onLine) {
-              return caches.match('./offline.html');
-            }
+            // IMPORTANT: Clone the response. A response is a stream
+            // and because we want the browser to consume the response
+            // as well as the cache consuming the response, we need
+            // to clone it so we have two streams.
+            var responseToCache = response.clone();
 
-            // Fetch the request and update the cache
-            return fetchAndCache(event.request);
-          });
-      })
-      .catch(function() {
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          }
+        )
+      }).catch(function () {  // Untuk menampilkan offline.html ketika tidak ada koneksi internet
+        // If both fail, show a generic fallback:
         return caches.match('./offline.html');
+        // However, in reality you'd have many different
+        // fallbacks, depending on URL and headers.
+        // Eg, a fallback silhouette image for avatars.
       })
-  );
+    );
 });
-
-
-// Fetch the request, update the cache, and return the response
-function fetchAndCache(request) {
-  if (!navigator.onLine) {
-    return;
-  }
-  
-  return fetch(request)
-    .then(function(response) {
-      // Check if we received a valid response
-      if (!response || response.status !== 200 || response.type !== 'basic') {
-        return response;
-      }
-
-      // Clone the response to store in cache
-      var responseToCache = response.clone();
-
-      // Update the cache with the new response
-      caches.open(CACHE_NAME)
-        .then(function(cache) {
-          cache.put(request, responseToCache);
-        });
-
-      return response;
-    });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
